@@ -1,21 +1,25 @@
-pub fn adder(a: u32, b: u32) -> u32 {
-    let mut sum = a ^ b;
-    let mut carry = (a & b) << 1;
-    let mut temp_sum: u32;
+use crate::ex00::adder;
 
-    while carry != 0 {
-        temp_sum = sum ^ carry;
-        carry = (sum & carry) << 1;
-        sum = temp_sum;
+pub fn multiplier(a: u32, b: u32) -> u32 {
+    let mut result: u32 = 0;
+    let mut mut_a = a;
+    let mut mut_b = b;
+
+    while mut_b > 0 {
+        if mut_b & 1 == 1 {
+            result = adder(result, mut_a);
+        }
+        mut_a <<= 1;
+        mut_b >>= 1;
     }
-    sum
+    result
 }
 
 #[test]
-fn test_adder() {
+fn test_multiplier() {
     for i in 0..100 {
         for j in 0..100 {
-            assert_eq!(adder(i, j), i + j);
+            assert_eq!(multiplier(i, j), i * j);
         }
     }
 }
