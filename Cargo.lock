@@ -3,5 +3,5 @@
 version = 3
 
 [[package]]
-name = "ex01"
+name = "boolean_algebra"
 version = "0.1.0"

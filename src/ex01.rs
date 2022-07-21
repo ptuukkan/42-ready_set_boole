@@ -1,4 +1,4 @@
-fn adder(a: u32, b: u32) -> u32 {
+pub fn adder(a: u32, b: u32) -> u32 {
     let mut sum = a ^ b;
     let mut carry = (a & b) << 1;
     let mut temp_sum: u32;
@@ -9,10 +9,6 @@ fn adder(a: u32, b: u32) -> u32 {
         sum = temp_sum;
     }
     sum
-}
-
-fn main() {
-    println!("{}", adder(2000, 8000));
 }
 
 #[test]
