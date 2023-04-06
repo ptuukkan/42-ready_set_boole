@@ -1,9 +1,9 @@
 use crate::helpers::*;
+use itertools::Itertools;
 
-fn parse_symbol(c: &char) -> Result<Symbol<bool>, FormulaError> {
+fn parse_symbol(c: &char) -> Result<Symbol<char>, FormulaError> {
     match c {
-        '0' => Ok(Symbol::Operand(false)),
-        '1' => Ok(Symbol::Operand(true)),
+        'A'..='Z' => Ok(Symbol::Operand(c.to_owned())),
         '!' => Ok(Symbol::UnaryOperator(UnaryOperator::Negation)),
         '&' => Ok(Symbol::BinaryOperator(BinaryOperator::Conjunction)),
         '|' => Ok(Symbol::BinaryOperator(BinaryOperator::Disjunction)),
@@ -14,8 +14,8 @@ fn parse_symbol(c: &char) -> Result<Symbol<bool>, FormulaError> {
     }
 }
 
-fn parse_formula(formula: &str) -> Result<Node<bool>, FormulaError> {
-    let mut stack: Vec<Node<bool>> = Vec::new();
+fn parse_formula(formula: &str) -> Result<Node<char>, FormulaError> {
+    let mut stack: Vec<Node<char>> = Vec::new();
 
     for c in formula.chars() {
         let symbol = parse_symbol(&c)?;
@@ -50,41 +50,31 @@ fn parse_formula(formula: &str) -> Result<Node<bool>, FormulaError> {
 }
 
 fn evaluate(node: &Node<bool>) -> bool {
-    match node {
-        Node::Operand(n) => *n,
-        Node::UnaryExpr { op, child } => match op {
-            UnaryOperator::Negation => !evaluate(child),
-        },
-        Node::BinaryExpr { op, left, right } => {
-            let p = evaluate(left);
-            let q = evaluate(right);
-            match op {
-                BinaryOperator::Conjunction => p && q,
-                BinaryOperator::Disjunction => p || q,
-                BinaryOperator::ExclusiveDisjunction => p ^ q,
-                BinaryOperator::MaterialCondition => !(p && !q),
-                BinaryOperator::LogicalEquivalence => p == q,
+    fn evaluateInner(node: &Node<bool>) -> bool {
+        match node {
+            Node::Operand(n) => *n,
+            Node::UnaryExpr { op, child } => match op {
+                UnaryOperator::Negation => !evaluate(child),
+            },
+            Node::BinaryExpr { op, left, right } => {
+                let p = evaluate(left);
+                let q = evaluate(right);
+                match op {
+                    BinaryOperator::Conjunction => p && q,
+                    BinaryOperator::Disjunction => p || q,
+                    BinaryOperator::ExclusiveDisjunction => p ^ q,
+                    BinaryOperator::MaterialCondition => !(p && !q),
+                    BinaryOperator::LogicalEquivalence => p == q,
+                }
             }
         }
     }
+    evaluateInner(node)
 }
-
-pub fn eval_formula(formula: &str) -> bool {
-    if let Ok(btree) = parse_formula(formula) {
-        evaluate(&btree)
-    } else {
-        println!("FormulaError parsing formula");
-        false
+pub fn print_truth_table(formula: &str) -> bool {
+    let perms = (0..2).multi_cartesian_product(); 
+    for p in perms.into_iter() {
+        println!("{:?}", p);
     }
-}
-#[test]
-fn test_eval_formula() {
-    assert_eq!(eval_formula("10&"), false);
-    assert_eq!(eval_formula("10|"), true);
-    assert_eq!(eval_formula("11>"), true);
-    assert_eq!(eval_formula("10="), false);
-    assert_eq!(eval_formula("1011||="), true);
-    assert_eq!(eval_formula("1011||=!"), false);
-    assert_eq!(eval_formula("1!"), false);
-    assert_eq!(eval_formula("0!"), true);
+    true
 }
