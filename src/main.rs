@@ -5,7 +5,9 @@ mod ex01;
 mod ex02;
 mod ex03;
 mod ex04;
+mod ex05;
 mod helpers;
+mod ast;
 
 fn run_ex00(a: u32, b: u32) {
     println!("Adder: {} + {} = {}", a, b, ex00::adder(a, b));
@@ -29,6 +31,13 @@ fn run_ex03(formula: &str) {
 fn run_ex04(formula: &str) {
     println!("Print_truth_table: {}", formula);
     ex04::print_truth_table(formula);
+}
+fn run_ex05(formula: &str) {
+    println!(
+        "Negation_normal_norm: {} = {}",
+        formula,
+        ex05::negation_normal_form(formula)
+    );
 }
 
 fn main() {
@@ -54,6 +63,9 @@ fn main() {
         }
         "print_truth_table" => {
             run_ex04(args[1].as_str());
+        }
+        "negation_normal_form" => {
+            run_ex05(args[1].as_str());
         }
         _ => {
             println!("Unsupported argument");

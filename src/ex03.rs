@@ -1,4 +1,4 @@
-use crate::helpers::*;
+use crate::{helpers::*, ast::Node};
 
 fn parse_symbol(c: &char) -> Result<Symbol<bool>, FormulaError> {
     match c {
