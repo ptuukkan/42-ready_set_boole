@@ -73,7 +73,7 @@ pub fn eval_formula(formula: &str) -> bool {
     if let Ok(btree) = parse_formula(formula) {
         evaluate(&btree)
     } else {
-        println!("FormulaError parsing formula");
+        println!("Error parsing formula");
         false
     }
 }
