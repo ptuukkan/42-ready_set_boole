@@ -9,4 +9,10 @@ pub fn negation_normal_form(formula: &str) -> String {
 }
 
 #[test]
-fn test_negation_normal_form() {}
+fn test_negation_normal_form() {
+    assert_eq!("A!B!|", negation_normal_form("AB&!"));
+    assert_eq!("A!B!&", negation_normal_form("AB|!"));
+    assert_eq!("A!B|", negation_normal_form("AB>"));
+    assert_eq!("AB&A!B!&|", negation_normal_form("AB="));
+    assert_eq!("A!B!&C!|", negation_normal_form("AB|C&!"));
+}
