@@ -7,7 +7,7 @@ mod ex03;
 mod ex04;
 mod ex05;
 mod helpers;
-mod ast;
+mod proposition;
 
 fn run_ex00(a: u32, b: u32) {
     println!("Adder: {} + {} = {}", a, b, ex00::adder(a, b));

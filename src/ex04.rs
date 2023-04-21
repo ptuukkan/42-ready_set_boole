@@ -41,14 +41,15 @@ fn print_row(value_map: &BTreeMap<char, bool>, result: bool) {
 }
 
 pub fn print_truth_table(formula: &str) {
-    if let Ok(parse_result) = parse_formula(formula) {
+    let variables = ('A'..='Z').collect::<Vec<char>>();
+    if let Ok(parse_result) = parse_formula(formula, &variables) {
         let high_mask: u32 = 1 << parse_result.operands.len();
         
         print_header(&parse_result.operands);
 
         for mask in 0..high_mask {
             let value_map = get_value_map(&parse_result.operands, &mask);
-            let result = evaluate(&parse_result.tree, &value_map);
+            let result = evaluate(&parse_result.proposition, &value_map);
             print_row(&value_map, result);
         }
     } else {

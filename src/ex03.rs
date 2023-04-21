@@ -1,77 +1,15 @@
-use crate::{helpers::*, ast::Node};
+use std::collections::BTreeMap;
 
-fn parse_symbol(c: &char) -> Result<Symbol<bool>, FormulaError> {
-    match c {
-        '0' => Ok(Symbol::Operand(false)),
-        '1' => Ok(Symbol::Operand(true)),
-        '!' => Ok(Symbol::UnaryOperator(UnaryOperator::Negation)),
-        '&' => Ok(Symbol::BinaryOperator(BinaryOperator::Conjunction)),
-        '|' => Ok(Symbol::BinaryOperator(BinaryOperator::Disjunction)),
-        '^' => Ok(Symbol::BinaryOperator(BinaryOperator::ExclusiveDisjunction)),
-        '>' => Ok(Symbol::BinaryOperator(BinaryOperator::MaterialCondition)),
-        '=' => Ok(Symbol::BinaryOperator(BinaryOperator::LogicalEquivalence)),
-        _ => Err(FormulaError::UnexpectedSymbol),
-    }
-}
-
-fn parse_formula(formula: &str) -> Result<Node<bool>, FormulaError> {
-    let mut stack: Vec<Node<bool>> = Vec::new();
-
-    for c in formula.chars() {
-        let symbol = parse_symbol(&c)?;
-        match symbol {
-            Symbol::Operand(operand) => stack.push(Node::Operand(operand)),
-            Symbol::UnaryOperator(operator) => {
-                let child = stack.pop().ok_or(FormulaError::InvalidFormula)?;
-                let node = Node::UnaryExpr {
-                    op: operator,
-                    child: Box::new(child),
-                };
-                stack.push(node)
-            }
-            Symbol::BinaryOperator(operator) => {
-                let left = stack.pop().ok_or(FormulaError::InvalidFormula)?;
-                let right = stack.pop().ok_or(FormulaError::InvalidFormula)?;
-                let node = Node::BinaryExpr {
-                    op: operator,
-                    left: Box::new(left),
-                    right: Box::new(right),
-                };
-                stack.push(node)
-            }
-        }
-    }
-
-    let btree = stack.pop().ok_or(FormulaError::InvalidFormula)?;
-    if !stack.is_empty() {
-        return Err(FormulaError::InvalidFormula);
-    }
-    Ok(btree)
-}
-
-fn evaluate(node: &Node<bool>) -> bool {
-    match node {
-        Node::Operand(n) => *n,
-        Node::UnaryExpr { op, child } => match op {
-            UnaryOperator::Negation => !evaluate(child),
-        },
-        Node::BinaryExpr { op, left, right } => {
-            let p = evaluate(left);
-            let q = evaluate(right);
-            match op {
-                BinaryOperator::Conjunction => p && q,
-                BinaryOperator::Disjunction => p || q,
-                BinaryOperator::ExclusiveDisjunction => p ^ q,
-                BinaryOperator::MaterialCondition => !(p && !q),
-                BinaryOperator::LogicalEquivalence => p == q,
-            }
-        }
-    }
-}
+use crate::helpers::{evaluate, parse_formula};
 
 pub fn eval_formula(formula: &str) -> bool {
-    if let Ok(btree) = parse_formula(formula) {
-        evaluate(&btree)
+    let variables = vec!['0', '1'];
+    let mut value_map = BTreeMap::new();
+    value_map.insert('0', false);
+    value_map.insert('1', true);
+
+    if let Ok(parse_result) = parse_formula(formula, &variables) {
+        evaluate(&parse_result.proposition, &value_map)
     } else {
         println!("Error parsing formula");
         false
