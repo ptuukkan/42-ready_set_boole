@@ -1,3 +1,4 @@
+#[derive(Clone)]
 pub enum Proposition {
     Conjunction(Box<Proposition>, Box<Proposition>),
     Disjunction(Box<Proposition>, Box<Proposition>),
