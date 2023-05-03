@@ -6,6 +6,7 @@ mod ex02;
 mod ex03;
 mod ex04;
 mod ex05;
+mod ex06;
 mod helpers;
 mod proposition;
 
@@ -40,6 +41,14 @@ fn run_ex05(formula: &str) {
     );
 }
 
+fn run_ex06(formula: &str) {
+    println!(
+        "Conjunctive_normal_norm: {} = {}",
+        formula,
+        ex06::conjunctive_normal_form(formula)
+    );
+}
+
 fn main() {
     let args: Vec<String> = env::args().skip(1).collect();
 
@@ -66,6 +75,9 @@ fn main() {
         }
         "negation_normal_form" => {
             run_ex05(args[1].as_str());
+        }
+        "conjunctive_normal_form" => {
+            run_ex06(args[1].as_str());
         }
         _ => {
             println!("Unsupported argument");
