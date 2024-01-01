@@ -1,71 +1,75 @@
 use crate::{helpers::parse_formula, proposition::Proposition};
 
-fn rewrite(prop: &mut Proposition) {
+fn rewrite(prop: Proposition) -> Proposition {
     match prop {
-        Proposition::Negation(inner) => match &**inner {
-            Proposition::Negation(inner_inner) => {
-                *prop = *(inner_inner).clone();
-                rewrite(prop);
-            }
+        Proposition::Negation(inner) => match *inner {
+            Proposition::Negation(inner_inner) => rewrite(*inner_inner),
             Proposition::Conjunction(a, b) => {
-                *prop = Proposition::Disjunction(
-                    Box::new(Proposition::Negation(a.clone())),
-                    Box::new(Proposition::Negation(b.clone())),
-                );
-                rewrite(prop);
+                let p = rewrite(Proposition::Negation(a));
+                let q = rewrite(Proposition::Negation(b));
+                Proposition::Disjunction(Box::new(p), Box::new(q))
             }
             Proposition::Disjunction(a, b) => {
-                *prop = Proposition::Conjunction(
-                    Box::new(Proposition::Negation(a.clone())),
-                    Box::new(Proposition::Negation(b.clone())),
-                );
-                rewrite(prop);
-            },
-            Proposition::Variable(_) => {
-                rewrite(&mut *inner);
-            },
+                let p = rewrite(Proposition::Negation(a));
+                let q = rewrite(Proposition::Negation(b));
+                Proposition::Conjunction(Box::new(p), Box::new(q))
+            }
+            Proposition::Variable(x) => Proposition::Negation(Box::new(Proposition::Variable(x))),
             _ => {
-                rewrite(&mut *inner);
-                rewrite(prop);
-            },
+                let new_inner = rewrite(*inner);
+                rewrite(Proposition::Negation(Box::new(new_inner)))
+            }
         },
         Proposition::MaterialCondition(a, b) => {
-            *prop = Proposition::Disjunction(Box::new(Proposition::Negation(a.clone())), b.clone());
-            rewrite(prop);
+            let p = rewrite(Proposition::Negation(a));
+            let q = rewrite(*b);
+            Proposition::Disjunction(Box::new(p), Box::new(q))
         }
         Proposition::LogicalEquivalence(a, b) => {
-            *prop = Proposition::Conjunction(
-                Box::new(Proposition::MaterialCondition(a.clone(), b.clone())),
-                Box::new(Proposition::MaterialCondition(b.clone(), a.clone())),
-            );
-            rewrite(prop);
+            // let p = Proposition::MaterialCondition(
+            //     Box::new(rewrite(*a.clone())),
+            //     Box::new(rewrite(*b.clone())),
+            // );
+            // let q = Proposition::MaterialCondition(Box::new(rewrite(*b)), Box::new(rewrite(*a)));
+            let p = rewrite(Proposition::MaterialCondition(
+                Box::new(*a.clone()),
+                Box::new(*b.clone()),
+            ));
+            let q = rewrite(Proposition::MaterialCondition(Box::new(*b), Box::new(*a)));
+            Proposition::Conjunction(Box::new(p), Box::new(q))
         }
         Proposition::ExclusiveDisjunction(a, b) => {
-            *prop = Proposition::Disjunction(
-                Box::new(Proposition::Conjunction(
-                    a.clone(),
-                    Box::new(Proposition::Negation(b.clone())),
-                )),
-                Box::new(Proposition::Conjunction(
-                    Box::new(Proposition::Negation(a.clone())),
-                    b.clone(),
-                )),
-            );
-            rewrite(prop);
+            let p = rewrite(Proposition::Conjunction(
+                a.clone(),
+                Box::new(Proposition::Negation(b.clone())),
+            ));
+
+            let q = rewrite(Proposition::Conjunction(
+                Box::new(Proposition::Negation(a)),
+                b,
+            ));
+
+            Proposition::Disjunction(Box::new(p), Box::new(q))
         }
-        Proposition::Conjunction(a, b) | Proposition::Disjunction(a, b) => {
-            rewrite(&mut *a);
-            rewrite(&mut *b);
+        Proposition::Conjunction(a, b) => {
+            let p = rewrite(*a);
+            let q = rewrite(*b);
+            Proposition::Conjunction(Box::new(p), Box::new(q))
         }
-        Proposition::Variable(_) => (),
+        Proposition::Disjunction(a, b) => {
+            let p = rewrite(*a);
+            let q = rewrite(*b);
+            Proposition::Disjunction(Box::new(p), Box::new(q))
+        }
+        Proposition::Variable(x) => Proposition::Variable(x),
     }
 }
 
 pub fn negation_normal_form(formula: &str) -> String {
     let variables = ('A'..='Z').collect::<Vec<char>>();
-    if let Ok(mut parse_result) = parse_formula(formula, &variables) {
-        rewrite(&mut parse_result.proposition);
-        return parse_result.proposition.into_iter().collect();
+    if let Ok(parse_result) = parse_formula(formula, &variables) {
+        let nnf = rewrite(parse_result.proposition);
+        return nnf.into_iter().collect();
     }
     return String::from("Error");
 }
