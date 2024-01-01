@@ -7,6 +7,8 @@ mod ex03;
 mod ex04;
 mod ex05;
 mod ex06;
+mod ex07;
+mod dnf;
 mod helpers;
 mod proposition;
 
@@ -49,6 +51,21 @@ fn run_ex06(formula: &str) {
     );
 }
 
+fn run_ex07(formula: &str) {
+    println!(
+        "Sat: {} = {}",
+        formula,
+        ex07::sat(formula)
+    );
+}
+fn run_dnf(formula: &str) {
+    println!(
+        "Sat: {} = {}",
+        formula,
+        dnf::disjunctive_normal_form(formula)
+    );
+}
+
 fn main() {
     let args: Vec<String> = env::args().skip(1).collect();
 
@@ -79,6 +96,13 @@ fn main() {
         "conjunctive_normal_form" => {
             run_ex06(args[1].as_str());
         }
+        "sat" => {
+            run_ex07(args[1].as_str());
+        }
+        "disjunctive_normal_form" => {
+            run_dnf(args[1].as_str());
+        }
+
         _ => {
             println!("Unsupported argument");
         }
