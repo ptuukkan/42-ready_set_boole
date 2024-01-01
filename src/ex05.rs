@@ -26,11 +26,6 @@ fn rewrite(prop: Proposition) -> Proposition {
             Proposition::Disjunction(Box::new(p), Box::new(q))
         }
         Proposition::LogicalEquivalence(a, b) => {
-            // let p = Proposition::MaterialCondition(
-            //     Box::new(rewrite(*a.clone())),
-            //     Box::new(rewrite(*b.clone())),
-            // );
-            // let q = Proposition::MaterialCondition(Box::new(rewrite(*b)), Box::new(rewrite(*a)));
             let p = rewrite(Proposition::MaterialCondition(
                 Box::new(*a.clone()),
                 Box::new(*b.clone()),
