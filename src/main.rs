@@ -1,5 +1,6 @@
 use std::env;
 
+mod dnf;
 mod ex00;
 mod ex01;
 mod ex02;
@@ -8,7 +9,7 @@ mod ex04;
 mod ex05;
 mod ex06;
 mod ex07;
-mod dnf;
+mod ex08;
 mod helpers;
 mod proposition;
 
@@ -52,18 +53,19 @@ fn run_ex06(formula: &str) {
 }
 
 fn run_ex07(formula: &str) {
-    println!(
-        "Sat: {} = {}",
-        formula,
-        ex07::sat(formula)
-    );
+    println!("Sat: {} = {}", formula, ex07::sat(formula));
 }
+
 fn run_dnf(formula: &str) {
     println!(
         "Sat: {} = {}",
         formula,
         dnf::disjunctive_normal_form(formula)
     );
+}
+
+fn run_powerset(set: Vec<i32>) {
+    dbg!("Set: = {}", ex08::powerset(set));
 }
 
 fn main() {
@@ -101,6 +103,16 @@ fn main() {
         }
         "disjunctive_normal_form" => {
             run_dnf(args[1].as_str());
+        }
+        "powerset" => {
+            run_powerset(
+                args[1]
+                    .as_str()
+                    .split(" ")
+                    .into_iter()
+                    .map(|x| x.parse::<i32>().unwrap())
+                    .collect(),
+            );
         }
 
         _ => {
