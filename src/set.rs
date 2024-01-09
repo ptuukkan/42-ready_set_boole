@@ -1,32 +1,33 @@
-use std::collections::BTreeMap;
+use std::{collections::BTreeMap, fmt::Debug};
 
-use crate::{helpers::evaluate, proposition::Proposition};
-
-pub fn union<T: Clone>(a: &Vec<T>, b: &Vec<T>) -> Vec<T> {
+pub fn union<T>(a: &Vec<T>, b: &Vec<T>) -> Vec<T>
+where
+    T: PartialEq,
+    T: Clone,
+    T: Debug,
+{
     let mut res = a.clone();
-    res.append(&mut b.clone());
-    res
+    for x in b {
+        if !res.contains(x) {
+            res.push(x.clone());
+        }
+    }
+    res.to_vec()
 }
 
-pub fn relative_complement(a: &Vec<i32>, b: &Vec<i32>) -> Vec<i32> {
-    let res = b.clone();
-    res.into_iter().filter(|e| !a.contains(&e)).collect()
+pub fn complement(a: &Vec<i32>, variable_map: &BTreeMap<char, Vec<i32>>) -> Vec<i32> {
+    let union_of_sets = variable_map
+        .clone()
+        .into_iter()
+        .map(|(_c, v)| v)
+        .reduce(|acc, e| union(&acc, &e))
+        .unwrap();
+    union_of_sets
+        .into_iter()
+        .filter(|e| !a.contains(e))
+        .collect()
 }
 
-// pub fn evaluate(proposition: &Proposition, variables: &BTreeMap<char, Vec<i32>>) -> Vec<i32> {
-//     match proposition {
-//         Proposition::Conjunction(p, q) => union(
-//             &evaluate(p, variables),
-//             &evaluate(q, variables)
-//         ),
-//         Proposition::Disjunction(p, q) => todo!(),
-//         Proposition::ExclusiveDisjunction(p, q) => todo!(),
-//         Proposition::LogicalEquivalence(p, q) => todo!(),
-//         Proposition::MaterialCondition(p, q) => todo!(),
-//         Proposition::Negation(p) => todo!(),
-//         Proposition::Variable(x) => {
-//             let b = *variables.get(x).unwrap();
-//             b
-//         }
-//     }
-// }
+pub fn intersection(a: &Vec<i32>, b: &Vec<i32>) -> Vec<i32> {
+    a.clone().into_iter().filter(|e| b.contains(e)).collect()
+}

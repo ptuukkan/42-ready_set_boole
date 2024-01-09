@@ -1,4 +1,4 @@
-use std::collections::{HashSet, BTreeMap};
+use std::collections::{BTreeMap, HashSet};
 
 use crate::proposition::Proposition;
 
@@ -14,6 +14,10 @@ pub struct PropositionalFormula {
 impl PropositionalFormula {
     pub fn evaluate(&self, variable_map: &BTreeMap<char, bool>) -> bool {
         self.formula.evaluate(variable_map)
+    }
+
+    pub fn evaluate_set(&self, variable_map: &BTreeMap<char, Vec<i32>>) -> Vec<i32> {
+        self.formula.evaluate_set(variable_map)
     }
 }
 
