@@ -1,20 +1,40 @@
 use std::collections::BTreeMap;
 
-use crate::helpers::{evaluate, parse_formula};
+use crate::{proposition::Proposition, propositional_formula::PropositionalFormula};
+
+impl Proposition {
+    pub fn evaluate(&self, variable_map: &BTreeMap<char, bool>) -> bool {
+        match self {
+            Proposition::Conjunction(p, q) => p.evaluate(variable_map) && q.evaluate(variable_map),
+            Proposition::Disjunction(p, q) => p.evaluate(variable_map) || q.evaluate(variable_map),
+            Proposition::ExclusiveDisjunction(p, q) => {
+                p.evaluate(variable_map) ^ q.evaluate(variable_map)
+            }
+            Proposition::LogicalEquivalence(p, q) => {
+                p.evaluate(variable_map) == q.evaluate(variable_map)
+            }
+            Proposition::MaterialCondition(p, q) => {
+                !p.evaluate(variable_map) || q.evaluate(variable_map)
+            }
+            Proposition::Negation(p) => !p.evaluate(variable_map),
+            Proposition::Variable(x) => *variable_map.get(x).unwrap(),
+        }
+    }
+}
 
 pub fn eval_formula(formula: &str) -> bool {
-    let variables = vec!['0', '1'];
-    let mut value_map = BTreeMap::new();
-    value_map.insert('0', false);
-    value_map.insert('1', true);
+    let mut variable_map = BTreeMap::new();
+    variable_map.insert('0', false);
+    variable_map.insert('1', true);
 
-    if let Ok(parse_result) = parse_formula(formula, &variables) {
-        evaluate(&parse_result.proposition, &value_map)
+    if let Ok(pf) = PropositionalFormula::try_from(formula) {
+        pf.evaluate(&variable_map)
     } else {
-        println!("Error parsing formula");
+        println!("Error");
         false
     }
 }
+
 #[test]
 fn test_eval_formula() {
     assert_eq!(eval_formula("10&"), false);

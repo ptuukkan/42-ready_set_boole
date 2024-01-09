@@ -1,3 +1,5 @@
+use std::{fmt, collections::BTreeMap};
+
 #[derive(Clone)]
 pub enum Proposition {
     Conjunction(Box<Proposition>, Box<Proposition>),
@@ -68,5 +70,12 @@ impl IntoIterator for Proposition {
 
     fn into_iter(self) -> Self::IntoIter {
         self.postorder().into_iter()
+    }
+}
+
+impl fmt::Display for Proposition {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let str = self.clone().into_iter().collect::<String>();
+        write!(f, "{}", str)
     }
 }

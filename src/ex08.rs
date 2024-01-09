@@ -1,8 +1,4 @@
-fn union<T: Clone>(s1: &Vec<T>, s2: &Vec<T>) -> Vec<T> {
-    let mut res = s1.clone();
-    res.append(&mut s2.clone());
-    res
-}
+use crate::set::*;
 
 pub fn powerset(set: Vec<i32>) -> Vec<Vec<i32>> {
     match set[..] {
