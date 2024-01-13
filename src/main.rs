@@ -1,5 +1,6 @@
 use std::env;
 
+mod dnf;
 mod ex00;
 mod ex01;
 mod ex02;
@@ -8,9 +9,12 @@ mod ex04;
 mod ex05;
 mod ex06;
 mod ex07;
-mod dnf;
+mod ex08;
+mod ex09;
 mod helpers;
 mod proposition;
+mod propositional_formula;
+mod set;
 
 fn run_ex00(a: u32, b: u32) {
     println!("Adder: {} + {} = {}", a, b, ex00::adder(a, b));
@@ -52,18 +56,23 @@ fn run_ex06(formula: &str) {
 }
 
 fn run_ex07(formula: &str) {
-    println!(
-        "Sat: {} = {}",
-        formula,
-        ex07::sat(formula)
-    );
+    println!("Sat: {} = {}", formula, ex07::sat(formula));
 }
+
 fn run_dnf(formula: &str) {
     println!(
         "Disjunctive_normal_form: {} = {}",
         formula,
         dnf::disjunctive_normal_form(formula)
     );
+}
+
+fn run_powerset(set: Vec<i32>) {
+    dbg!(ex08::powerset(set));
+}
+
+fn run_eval_set(formula: &str, sets: Vec<Vec<i32>>) {
+    dbg!(ex09::eval_set(formula, sets));
 }
 
 fn main() {
@@ -101,6 +110,33 @@ fn main() {
         }
         "disjunctive_normal_form" => {
             run_dnf(args[1].as_str());
+        }
+        "powerset" => {
+            run_powerset(
+                args[1]
+                    .as_str()
+                    .split(" ")
+                    .into_iter()
+                    .map(|x| x.parse::<i32>().unwrap())
+                    .collect(),
+            );
+        }
+        "eval_set" => {
+            run_eval_set(
+                args[1].as_str(),
+                args[2]
+                    .as_str()
+                    .split(";")
+                    .into_iter()
+                    .map(|x| {
+                        x.trim()
+                            .split(" ")
+                            .into_iter()
+                            .map(|y| y.parse::<i32>().unwrap())
+                            .collect()
+                    })
+                    .collect(),
+            );
         }
 
         _ => {

@@ -77,7 +77,7 @@ pub fn evaluate(proposition: &Proposition, value_map: &BTreeMap<char, bool>) -> 
         Proposition::ExclusiveDisjunction(p, q) => evaluate(p, value_map) ^ evaluate(q, value_map),
         Proposition::LogicalEquivalence(p, q) => evaluate(p, value_map) == evaluate(q, value_map),
         Proposition::MaterialCondition(p, q) => {
-            !(evaluate(p, value_map) && !evaluate(q, value_map))
+            !(evaluate(p, value_map) || evaluate(q, value_map))
         }
         Proposition::Negation(p) => !evaluate(p, value_map),
         Proposition::Variable(x) => *value_map.get(x).unwrap(),
@@ -92,3 +92,4 @@ pub fn get_value_map(value_map: &BTreeMap<char, bool>, mask: &u32) -> BTreeMap<c
     }
     masked_value_map
 }
+

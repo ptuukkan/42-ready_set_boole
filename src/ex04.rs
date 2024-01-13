@@ -1,17 +1,45 @@
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashSet};
 
-use crate::helpers::*;
+use crate::propositional_formula::PropositionalFormula;
 
-fn print_header(value_map: &BTreeMap<char, bool>) {
-    let header = value_map
+impl PropositionalFormula {
+    pub fn print_truth_table(&self) {
+        let mask: u32 = 1 << self.variables.len();
+
+        print_header(&self.variables);
+
+        for m in 0..mask {
+            let variable_map = self.get_variable_map(m);
+            let result = self.evaluate(&variable_map);
+            print_row(&variable_map, result);
+        }
+    }
+
+    pub fn get_variable_map(&self, mask: u32) -> BTreeMap<char, bool> {
+        let mut variable_map: BTreeMap<char, bool> = BTreeMap::new();
+        let mut vars = Vec::from_iter(&self.variables);
+        vars.sort();
+
+        for (i, c) in vars.iter().rev().enumerate() {
+            variable_map.insert(*c.to_owned(), (mask >> i & 1) == 1);
+        }
+        variable_map
+    }
+}
+
+fn print_header(variables: &HashSet<char>) {
+    let mut vars = Vec::from_iter(variables);
+    vars.sort();
+
+    let header = vars
         .iter()
-        .map(|v| v.0.to_string())
+        .map(|v| v.to_string())
         .collect::<Vec<String>>()
         .join(" | ");
 
     println!("| {} | = |", header);
 
-    let border = value_map
+    let border = vars
         .iter()
         .map(|_v| "-".to_string())
         .collect::<Vec<String>>()
@@ -20,8 +48,8 @@ fn print_header(value_map: &BTreeMap<char, bool>) {
     println!("|-{}-|---|", border);
 }
 
-fn print_row(value_map: &BTreeMap<char, bool>, result: bool) {
-    let row = value_map
+fn print_row(variable_map: &BTreeMap<char, bool>, result: bool) {
+    let row = variable_map
         .iter()
         .map(|v| match *v.1 {
             true => "1",
@@ -41,17 +69,8 @@ fn print_row(value_map: &BTreeMap<char, bool>, result: bool) {
 }
 
 pub fn print_truth_table(formula: &str) {
-    let variables = ('A'..='Z').collect::<Vec<char>>();
-    if let Ok(parse_result) = parse_formula(formula, &variables) {
-        let high_mask: u32 = 1 << parse_result.operands.len();
-        
-        print_header(&parse_result.operands);
-
-        for mask in 0..high_mask {
-            let value_map = get_value_map(&parse_result.operands, &mask);
-            let result = evaluate(&parse_result.proposition, &value_map);
-            print_row(&value_map, result);
-        }
+    if let Ok(pf) = PropositionalFormula::try_from(formula) {
+        pf.print_truth_table();
     } else {
         println!("Error");
     }
