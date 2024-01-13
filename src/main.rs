@@ -37,7 +37,7 @@ fn run_ex04(formula: &str) {
 }
 fn run_ex05(formula: &str) {
     println!(
-        "Negation_normal_norm: {} = {}",
+        "Negation_normal_form: {} = {}",
         formula,
         ex05::negation_normal_form(formula)
     );
@@ -45,7 +45,7 @@ fn run_ex05(formula: &str) {
 
 fn run_ex06(formula: &str) {
     println!(
-        "Conjunctive_normal_norm: {} = {}",
+        "Conjunctive_normal_form: {} = {}",
         formula,
         ex06::conjunctive_normal_form(formula)
     );
@@ -60,7 +60,7 @@ fn run_ex07(formula: &str) {
 }
 fn run_dnf(formula: &str) {
     println!(
-        "Sat: {} = {}",
+        "Disjunctive_normal_form: {} = {}",
         formula,
         dnf::disjunctive_normal_form(formula)
     );
