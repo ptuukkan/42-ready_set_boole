@@ -11,6 +11,8 @@ mod ex06;
 mod ex07;
 mod ex08;
 mod ex09;
+mod ex10;
+mod ex11;
 mod helpers;
 mod proposition;
 mod propositional_formula;
@@ -73,6 +75,14 @@ fn run_powerset(set: Vec<i32>) {
 
 fn run_eval_set(formula: &str, sets: Vec<Vec<i32>>) {
     dbg!(ex09::eval_set(formula, sets));
+}
+
+fn run_ex10(x: u16, y: u16) {
+    println!("Map: {} , {} = {}", x, y, ex10::map(x, y));
+}
+
+fn run_ex11(n: f64) {
+    println!("Reverse_map: {} = {:?}", n, ex11::reverse_map(n));
 }
 
 fn main() {
@@ -138,7 +148,15 @@ fn main() {
                     .collect(),
             );
         }
-
+        "map" => {
+            let a = args[1].parse::<u16>().unwrap();
+            let b = args[2].parse::<u16>().unwrap();
+            run_ex10(a, b);
+        }
+        "reverse_map" => {
+            let n = args[1].parse::<f64>().unwrap();
+            run_ex11(n);
+        }
         _ => {
             println!("Unsupported argument");
         }
