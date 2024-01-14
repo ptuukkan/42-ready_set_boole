@@ -3,6 +3,18 @@ use std::collections::{BTreeMap, HashSet};
 use crate::propositional_formula::PropositionalFormula;
 
 impl PropositionalFormula {
+    #[allow(dead_code)]
+    pub fn get_truth_table(&self) -> Vec<(u32, bool)> {
+        let mask: u32 = 1 << self.variables.len();
+        (0..mask)
+            .map(|m| {
+                let variable_map = self.get_variable_map(m);
+                let result = self.evaluate(&variable_map);
+                (m, result)
+            })
+            .collect()
+    }
+
     pub fn print_truth_table(&self) {
         let mask: u32 = 1 << self.variables.len();
 

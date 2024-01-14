@@ -2,8 +2,10 @@ use std::collections::{BTreeMap, HashSet};
 
 use crate::proposition::Proposition;
 
+#[derive(Debug)]
 pub enum FormulaError {
     InvalidFormula,
+    UnexpectedSymbol,
 }
 
 pub struct PropositionalFormula {
@@ -62,7 +64,7 @@ impl TryFrom<&str> for PropositionalFormula {
                     variables.insert(c);
                     stack.push(Proposition::Variable(c));
                 }
-                _ => {}
+                _ => return Err(FormulaError::UnexpectedSymbol),
             }
         }
 

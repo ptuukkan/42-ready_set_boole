@@ -1,4 +1,4 @@
-use std::{fmt, collections::BTreeMap};
+use std::fmt;
 
 #[derive(Clone)]
 pub enum Proposition {
@@ -11,15 +11,17 @@ pub enum Proposition {
     Variable(char),
 }
 
-fn proposition_to_char(proposition: &Proposition) -> char {
-    match proposition {
-        Proposition::Conjunction(_, _) => '&',
-        Proposition::Disjunction(_, _) => '|',
-        Proposition::ExclusiveDisjunction(_, _) => '^',
-        Proposition::LogicalEquivalence(_, _) => '=',
-        Proposition::MaterialCondition(_, _) => '>',
-        Proposition::Negation(_) => '!',
-        Proposition::Variable(x) => x.to_owned(),
+impl From<&Proposition> for char {
+    fn from(value: &Proposition) -> Self {
+        match value {
+            Proposition::Conjunction(_, _) => '&',
+            Proposition::Disjunction(_, _) => '|',
+            Proposition::ExclusiveDisjunction(_, _) => '^',
+            Proposition::LogicalEquivalence(_, _) => '=',
+            Proposition::MaterialCondition(_, _) => '>',
+            Proposition::Negation(_) => '!',
+            Proposition::Variable(x) => x.to_owned(),
+        }
     }
 }
 
@@ -28,36 +30,20 @@ impl Proposition {
         let mut result = vec![];
 
         match self {
-            Proposition::Conjunction(p, q) => {
+            Proposition::Conjunction(p, q)
+            | Proposition::Disjunction(p, q)
+            | Proposition::ExclusiveDisjunction(p, q)
+            | Proposition::LogicalEquivalence(p, q)
+            | Proposition::MaterialCondition(p, q) => {
                 result.append(&mut p.postorder());
                 result.append(&mut q.postorder());
-                result.push(proposition_to_char(self))
-            }
-            Proposition::Disjunction(p, q) => {
-                result.append(&mut p.postorder());
-                result.append(&mut q.postorder());
-                result.push(proposition_to_char(self))
-            }
-            Proposition::ExclusiveDisjunction(p, q) => {
-                result.append(&mut p.postorder());
-                result.append(&mut q.postorder());
-                result.push(proposition_to_char(self))
-            }
-            Proposition::LogicalEquivalence(p, q) => {
-                result.append(&mut p.postorder());
-                result.append(&mut q.postorder());
-                result.push(proposition_to_char(self))
-            }
-            Proposition::MaterialCondition(p, q) => {
-                result.append(&mut p.postorder());
-                result.append(&mut q.postorder());
-                result.push(proposition_to_char(self))
+                result.push(char::from(self))
             }
             Proposition::Negation(p) => {
                 result.append(&mut p.postorder());
-                result.push(proposition_to_char(self));
+                result.push(char::from(self));
             }
-            Proposition::Variable(_) => result.push(proposition_to_char(self)),
+            Proposition::Variable(_) => result.push(char::from(self)),
         }
 
         result
