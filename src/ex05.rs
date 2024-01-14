@@ -80,11 +80,31 @@ pub fn negation_normal_form(formula: &str) -> String {
 
 #[test]
 fn test_negation_normal_form() {
-    assert_eq!("A!B!|", negation_normal_form("AB&!"));
-    assert_eq!("A!B!&", negation_normal_form("AB|!"));
-    assert_eq!("A!B|", negation_normal_form("AB>"));
-    assert_eq!("A!B|B!A|&", negation_normal_form("AB="));
-    assert_eq!("A!B!&C!|", negation_normal_form("AB|C&!"));
-    assert_eq!("AB|", negation_normal_form("A!B>"));
-    assert_eq!("A!B!&AB&|", negation_normal_form("A!B^"));
+
+    test_nnf("A", "A");
+    test_nnf("A!", "A!");
+    test_nnf("AB&!", "A!B!|");
+    test_nnf("AB|!", "A!B!&");
+    test_nnf("AB>!", "AB!&");
+    test_nnf("AB=!", "AB!&BA!&|");
+    test_nnf("AB>", "A!B|");
+    test_nnf("AB=", "A!B|B!A|&");
+    test_nnf("AB|C&!", "A!B!&C!|");
+    test_nnf("A!B>", "AB|");
+    test_nnf("A!B^", "A!B!&AB&|");
+    test_nnf("ABC||", "ABC||");
+    test_nnf("ABC||!", "A!B!C!&&");
+    test_nnf("ABC|&", "ABC|&");
+    test_nnf("ABC&|", "ABC&|");
+    test_nnf("ABC&|!", "A!B!C!|&");
+    test_nnf("ABC^^", "AB!C|BC!|&&A!BC!&B!C&|&|");
+    test_nnf("ABC>>", "A!B!C||");
+
+
+    fn test_nnf(formula: &str, expected: &str) {
+        let pf = PropositionalFormula::try_from(formula).unwrap();
+        let nnf = pf.to_nnf();
+        assert_eq!(expected, nnf.formula.to_string());
+        assert_eq!(pf.get_truth_table(), nnf.get_truth_table());
+    }
 }

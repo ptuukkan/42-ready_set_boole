@@ -45,4 +45,25 @@ fn test_eval_formula() {
     assert_eq!(eval_formula("1011||=!"), false);
     assert_eq!(eval_formula("1!"), false);
     assert_eq!(eval_formula("0!"), true);
+    assert_eq!(eval_formula("00|"), false);
+    assert_eq!(eval_formula("01|"), true);
+    assert_eq!(eval_formula("11|"), true);
+    assert_eq!(eval_formula("11&"), true);
+    assert_eq!(eval_formula("11^"), false);
+    assert_eq!(eval_formula("10^"), true);
+    assert_eq!(eval_formula("00>"), true);
+    assert_eq!(eval_formula("01>"), true);
+    assert_eq!(eval_formula("10>"), false);
+    assert_eq!(eval_formula("11>"), true);
+    assert_eq!(eval_formula("00="), true);
+    assert_eq!(eval_formula("11="), true);
+    assert_eq!(eval_formula("10="), false);
+    assert_eq!(eval_formula("01="), false);
+    assert_eq!(eval_formula("11&0|"), true);
+    assert_eq!(eval_formula("10&1|"), true);
+    assert_eq!(eval_formula("11&1|"), true);
+    assert_eq!(eval_formula("11&1|1^"), false);
+    assert_eq!(eval_formula("01&1|1="), true);
+    assert_eq!(eval_formula("01&1&1&"), false);
+    assert_eq!(eval_formula("0111&&&"), false);
 }
